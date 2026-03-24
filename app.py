@@ -139,14 +139,14 @@ def compare_skus(df_pedidos, sku_ped_col, val_ped_col, df_preco, sku_pre_col, va
 
     result = merged.rename(columns={
         sku_ped_col: "SKU Logista",
-        val_ped_col: "Valor SKU",
+        val_ped_col: "Valor Vendido",
         sku_pre_col: "SKU Seller",
-        val_pre_col: "Preço Por",
+        val_pre_col: "Preço Anunciado",
         "diferença_valor": "Diferença",
         "status_comparação": "Status",
     })
 
-    keep = extra_cols + ["SKU Logista", "SKU Seller", "Valor SKU", "Preço Por", "Diferença", "Status"]
+    keep = extra_cols + ["SKU Logista", "SKU Seller", "Valor Vendido", "Preço Anunciado", "Diferença", "Status"]
     return result[[c for c in keep if c in result.columns]]
 
 
@@ -156,10 +156,15 @@ def style_table(df):
         if row["Status"] == "OK":
             return ["background-color: #d4f7dc; color: #155724"] * len(row)
         if row["Status"] == "DIVERGENTE":
-            return ["background-color: #fde8e8; color: #721c24"] * len(row)
+            if row["Diferença"] > 0:
+                return ["background-color: #fde8e8; color: #721c24"] * len(row)
+            elif row["Diferença"] < 0:
+                return ["background-color: #ffe8cc; color: #c45e00"] * len(row)
+            else:
+                return ["background-color: #fde8e8; color: #721c24"] * len(row)
         return ["background-color: #fff3cd; color: #856404"] * len(row)
 
-    fmt = {c: "R$ {:,.2f}".format for c in ["Valor SKU", "Preço Por", "Diferença"]
+    fmt = {c: "R$ {:,.2f}".format for c in ["Valor Vendido", "Preço Anunciado", "Diferença"]
            if c in df.columns}
     return df.style.apply(row_color, axis=1).format(fmt, na_rep="—")
 
