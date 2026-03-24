@@ -100,7 +100,16 @@ def find_required_columns(df, sku_candidates, val_candidates, label):
 
 def compare_skus(df_pedidos, sku_ped_col, val_ped_col, df_preco, sku_pre_col, val_pre_col):
     """Realiza a comparação entre as duas planilhas."""
-    ped = df_pedidos[[sku_ped_col, val_ped_col]].copy()
+    
+    # Identifica colunas extras solicitadas (ignorando espaços/acentos sutis)
+    extra_cols = []
+    cands = ["númeropedido", "número pedido", "numeropedido", "numero pedido", 
+             "nomedoproduto", "nome do produto", "nomeproduto"]
+    for c in df_pedidos.columns:
+        if str(c).strip().lower() in cands:
+            extra_cols.append(c)
+            
+    ped = df_pedidos[[sku_ped_col, val_ped_col] + extra_cols].copy()
     pre = df_preco[[sku_pre_col, val_pre_col]].copy()
 
     # Normalização de SKUs
@@ -137,7 +146,7 @@ def compare_skus(df_pedidos, sku_ped_col, val_ped_col, df_preco, sku_pre_col, va
         "status_comparação": "Status",
     })
 
-    keep = ["SKU Logista", "SKU Seller", "Valor SKU", "Preço Por", "Diferença", "Status"]
+    keep = extra_cols + ["SKU Logista", "SKU Seller", "Valor SKU", "Preço Por", "Diferença", "Status"]
     return result[[c for c in keep if c in result.columns]]
 
 
