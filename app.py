@@ -212,7 +212,7 @@ with col1:
     ''', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🔀 Acessar Comparador Genérico", type="primary", use_container_width=True):
-        st.switch_page("pages/Comparador_Generico.py")
+        st.switch_page("Comparador_Generico")
 
 with col2:
     st.markdown('''
@@ -237,7 +237,7 @@ with col2:
     ''', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🔍 Acessar Comparador de SKUs", type="primary", use_container_width=True):
-        st.switch_page("pages/Comparador_Netshoes.py")
+        st.switch_page("Comparador_Netshoes")
 
 st.markdown('<hr class="divider-line">', unsafe_allow_html=True)
 
