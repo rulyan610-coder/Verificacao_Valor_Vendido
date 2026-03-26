@@ -6,8 +6,8 @@ Execução:
 """
 
 import io
-import pandas as pd
-import streamlit as st
+import pandas as pd  # type: ignore
+import streamlit as st  # type: ignore
 
 # ── Configuração da página ────────────────────────────────────────────────────
 st.set_page_config(
@@ -20,6 +20,7 @@ st.set_page_config(
 # ── CSS customizado ───────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+    [data-testid="stSidebar"] {display: none;}
     .main-title {
         font-size: 2.2rem; font-weight: 800;
         color: #1a1a2e; text-align: center; margin-bottom: 0.2rem;
@@ -71,7 +72,7 @@ def to_numeric_safe(series: pd.Series) -> pd.Series:
     return pd.to_numeric(series, errors="coerce")
 
 
-def detect_columns(df: pd.DataFrame, candidates: list[str]) -> str | None:
+def detect_columns(df: pd.DataFrame, candidates: list):
     """Retorna o primeiro nome de coluna (case-insensitive) que bater com algum candidato."""
     df_cols_lower = {c.lower().strip(): c for c in df.columns}
     for cand in candidates:
@@ -80,7 +81,7 @@ def detect_columns(df: pd.DataFrame, candidates: list[str]) -> str | None:
     return None
 
 
-def find_required_columns(df, sku_candidates, val_candidates, label):
+def find_required_columns(df: pd.DataFrame, sku_candidates: list, val_candidates: list, label: str):
     """Detecta as colunas de SKU e valor; exibe seletores se não encontrar."""
     sku_col = detect_columns(df, sku_candidates)
     val_col = detect_columns(df, val_candidates)
@@ -99,7 +100,10 @@ def find_required_columns(df, sku_candidates, val_candidates, label):
     return sku_col, val_col
 
 
-def compare_skus(df_pedidos, sku_ped_col, val_ped_col, df_preco, sku_pre_col, val_pre_col):
+def compare_skus(
+    df_pedidos: pd.DataFrame, sku_ped_col: str, val_ped_col: str,
+    df_preco: pd.DataFrame, sku_pre_col: str, val_pre_col: str
+) -> pd.DataFrame:
     """Realiza a comparação entre as duas planilhas."""
     
     # Identifica colunas extras solicitadas (ignorando espaços/acentos sutis)
@@ -110,8 +114,8 @@ def compare_skus(df_pedidos, sku_ped_col, val_ped_col, df_preco, sku_pre_col, va
         if str(c).strip().lower() in cands:
             extra_cols.append(c)
             
-    ped = df_pedidos[[sku_ped_col, val_ped_col] + extra_cols].copy()
-    pre = df_preco[[sku_pre_col, val_pre_col]].copy()
+    ped: pd.DataFrame = df_pedidos[[sku_ped_col, val_ped_col] + extra_cols].copy()
+    pre: pd.DataFrame = df_preco[[sku_pre_col, val_pre_col]].copy()
 
     # Normalização de SKUs
     ped["_sku_norm"] = normalize_sku(ped[sku_ped_col])
@@ -242,9 +246,9 @@ if file_pedidos and file_preco and not df_pedidos.empty and not df_preco.empty:
 
         # ── Métricas ──────────────────────────────────────────────
         total  = len(result_df)
-        n_ok   = (result_df["Status"] == "OK").sum()
-        n_div  = (result_df["Status"] == "DIVERGENTE").sum()
-        n_miss = (result_df["Status"] == "SKU NÃO ENCONTRADO").sum()
+        n_ok   = len(result_df[result_df["Status"] == "OK"])
+        n_div  = len(result_df[result_df["Status"] == "DIVERGENTE"])
+        n_miss = len(result_df[result_df["Status"] == "SKU NÃO ENCONTRADO"])
 
         st.markdown("### 📊 Indicadores")
         m1, m2, m3, m4 = st.columns(4)
