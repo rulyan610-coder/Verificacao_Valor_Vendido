@@ -14,6 +14,7 @@ st.set_page_config(
     page_title="Comparador de SKUs e Preços",
     page_icon="🔍",
     layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
 # ── CSS customizado ───────────────────────────────────────────────────────────
